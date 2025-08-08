@@ -2,7 +2,8 @@ class Person extends GameObject {
 
 	constructor(config) {
 		super(config)
-		this.movingProgressRemaining = 16;
+		this.movingProgressRemaining = 0;
+		this.isPlayerControlled = config.isPlayerControlled || false
 		this.directionUpdate = {
 			"up": ["y", -1],
 			"down": ["y", 1],
@@ -10,22 +11,72 @@ class Person extends GameObject {
 			"right": ["x", 1],
 		}
 	}
+
 	update(state) {
+		// 
+		if (this.movingProgressRemaining > 0) {
+			this.updatePosition()
 
-		if (this.movingProgressRemaining === 0 && state.arrow) {
+		} else {
+			//More cases for walk will come here!
 
-			this.direction = state.arrow;
-			this.movingProgressRemaining = 16;
+
+
+			//Case: keyboard ready and arrow pressed
+			if (this.isPlayerControlled && state.arrow) {
+				this.startBehavior(state, {
+					type: "walk",
+					direction: state.arrow
+				})
+			}
+			this.updateSprite(state)
 		}
-		this.updatePosition()
+
+	}
+	startBehavior(state, behavior) {
+
+		this.direction = behavior.direction
+		//only move if no space is taken
+		if (behavior.type === "walk") {
+			if (state.map.isSpaceTaken(this.x, this.y, this.direction)) {
+				behavior.retry && setTimeout(() => {
+					this.startBehavior(state, behavior)
+				}, 10)
+				return;
+			}
+			//Walk!
+			state.map.moveWall(this.x, this.y, this.direction)
+			this.movingProgressRemaining = 16;
+			this.updateSprite(state)
+		}
+		if (behavior.type === "stand") {
+			setTimeout(() => {
+				utils.emitEvent("PersonStandingComplete", {
+					whoId: this.id
+				})
+
+			}, behavior.time)
+		}
 	}
 
 	updatePosition() {
-		if (this.movingProgressRemaining > 0) {
-			const [property, change] = this.directionUpdate[this.direction]
-			this[property] += change;
-			this.movingProgressRemaining -= 1
+		const [property, change] = this.directionUpdate[this.direction]
+		this[property] += change;
+		this.movingProgressRemaining -= 1
+		if (this.movingProgressRemaining === 0) {
+			//walk finished
+			utils.emitEvent("PersonWalkingComplete", {
+				whoId: this.id
+			})
 		}
 	}
+	updateSprite() {
+		if (this.movingProgressRemaining > 0) {
+			this.sprite.setAnimation("walk-" + this.direction)
+			return
+		}
+		this.sprite.setAnimation("idle-" + this.direction)
+	}
+
 
 }
