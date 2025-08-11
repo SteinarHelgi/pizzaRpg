@@ -8,7 +8,7 @@ class GameObject {
 		this.direction = config.direction || "down";
 		this.behaviorLoop = config.behaviorLoop || []
 		this.behaviorLoopIndex = 0
-		this.talking = config.talking
+		this.talking = config.talking || [];
 
 		this.sprite = new Sprite({
 			gameObject: this,

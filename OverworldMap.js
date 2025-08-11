@@ -58,7 +58,11 @@ class OverworldMap {
 		const match = Object.values(this.gameObjects).find(object => {
 			return `${object.x},${object.y}` === `${nextCoords.x},${nextCoords.y}`
 		})
-		console.log({ match })
+		if (!this.isCutscenePlaying && match && match.talking.length) {
+			this.startCutscene(match.talking[0].events)
+
+		}
+
 
 	}
 	addWall(x, y) {
@@ -85,24 +89,17 @@ window.OverworldMaps = {
 			}),
 			npc1: new Person({
 				x: utils.withGrid(7),
-				y: utils.withGrid(4),
+				y: utils.withGrid(5),
 				src: "/images/characters/people/npc1.png",
 				behaviorLoop: [
-					{ type: "walk", direction: "down" },
-					{ type: "stand", direction: "left", time: 800 },
-					{ type: "walk", direction: "up" },
 					{ type: "stand", direction: "right", time: 800 },
-					{ type: "walk", direction: "down" },
-					{ type: "walk", direction: "down" },
-					{ type: "stand", direction: "right", time: 800 },
-					{ type: "walk", direction: "right" },
-					{ type: "stand", direction: "left", time: 800 },
-					{ type: "walk", direction: "up" },
 				],
 				talking: [
 					{
 						events: [
-							{ type: "TextMessage", text: "hi there!" }
+							{ type: "textMessage", text: "hi there!", faceHero: "npc1" },
+							{ type: "textMessage", text: "how are ya'" },
+
 						]
 					}
 				]

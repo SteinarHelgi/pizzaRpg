@@ -43,6 +43,12 @@ class OverworldEvent {
 
 	}
 	textMessage(resolve) {
+		if (this.event.faceHero) {
+			const obj = this.map.gameObjects[this.event.faceHero]
+			console.log(this.map.gameObjects["hero"].direction)
+			obj.direction = utils.oppositeDirection(this.map.gameObjects["hero"].direction)
+			console.log("Target:", obj.direction)
+		}
 		const message = new TextMessage({
 			text: this.event.text,
 			onComplete: () => resolve()

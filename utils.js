@@ -25,6 +25,23 @@ const utils = {
 		return { x, y }
 
 	},
+	oppositeDirection(direction) {
+		//Get the direction of the hero.
+		//set the direction of the npc to the opposite
+		if (direction === "left") {
+			return "right"
+		};
+		if (direction === "right") {
+			return "left"
+		}
+		if (direction === "up") {
+			return "down"
+		}
+		if (direction === "down") {
+			return "up"
+		}
+
+	},
 	emitEvent(name, detail) {
 		const event = new CustomEvent(name, { detail });
 		document.dispatchEvent(event)
