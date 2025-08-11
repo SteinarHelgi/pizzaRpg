@@ -6,20 +6,10 @@ class Overworld {
 		this.map = null;
 
 	}
-	startGameLoop(now) {
-
-		let lastTime = performance.now();
-		let lastFpsUpdate = lastTime;
-		let frameCount = 0;
-		let fps = 0;
-
+	startGameLoop() {
 		const step = () => {
-
-
 			//Clear draw
 			this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
-
-
 			//Establish camera person 
 			const cameraPerson = this.map.gameObjects.hero
 			//Update all objects
@@ -29,36 +19,34 @@ class Overworld {
 					map: this.map,
 				})
 			})
-
 			//Draw bottom layer
 			this.map.drawLowerImage(this.ctx, cameraPerson)
 			//Draw all game objects
-
 			Object.values(this.map.gameObjects).sort((a, b) => {
 				return a.y - b.y
 			}).forEach((object) => {
 				object.sprite.draw(this.ctx, cameraPerson)
-
 			})
 			//Draw upper layer
 			this.map.drawUpperImage(this.ctx, cameraPerson)
 
-			frameCount++;
-			let elapsedSinceLastFps = now - lastFpsUpdate;
-			console.log(elapsedSinceLastFps)
-			if (elapsedSinceLastFps >= 1000) {  // update every second
-				fps = (frameCount * 1000) / elapsedSinceLastFps;
-				lastFpsUpdate = now;
-				frameCount = 0;
-				// print to console
-				console.log(`FPS: ${fps.toFixed(1)}`);
-			}
+			//Loop again
 			requestAnimationFrame(() => {
 				step()
 			})
 		}
 		step()
 	}
+
+	bindActionInput() {
+		new KeyPressListener("Enter", () => {
+			//Is there a person here to talk to?
+			this.map.checkForActionCutscene()
+
+		})
+	}
+
+
 	init() {
 		this.map = new OverworldMap(
 			window.OverworldMaps.DemoRoom
@@ -67,5 +55,19 @@ class Overworld {
 		this.directionInput = new DirectionInput()
 		this.directionInput.init()
 		this.startGameLoop()
+		this.bindActionInput()
+		/* this.map.startCutscene([
+			{ who: "hero", type: "walk", direction: "right" },
+			{ who: "hero", type: "walk", direction: "right" },
+			{ who: "hero", type: "walk", direction: "right" },
+			{ who: "npc1", type: "walk", direction: "down" },
+			{ who: "npc1", type: "walk", direction: "left" },
+			{ who: "npc1", type: "walk", direction: "left" },
+			{ who: "npc1", type: "stand", direction: "down", time: 400 },
+			{ who: "hero", type: "stand", direction: "up", time: 400 },
+			{ type: "textMessage", text: "Thank you for coming" },
+			{ type: "textMessage", text: "Its my pleasure" },
+		])
+*/
 	}
 }

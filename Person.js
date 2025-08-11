@@ -3,6 +3,7 @@ class Person extends GameObject {
 	constructor(config) {
 		super(config)
 		this.movingProgressRemaining = 0;
+		this.isStanding = false
 		this.isPlayerControlled = config.isPlayerControlled || false
 		this.directionUpdate = {
 			"up": ["y", -1],
@@ -23,7 +24,7 @@ class Person extends GameObject {
 
 
 			//Case: keyboard ready and arrow pressed
-			if (this.isPlayerControlled && state.arrow) {
+			if (this.isPlayerControlled && state.arrow && !state.map.isCutscenePlaying) {
 				this.startBehavior(state, {
 					type: "walk",
 					direction: state.arrow
@@ -50,12 +51,14 @@ class Person extends GameObject {
 			this.updateSprite(state)
 		}
 		if (behavior.type === "stand") {
+			this.isStanding = true
 			setTimeout(() => {
 				utils.emitEvent("PersonStandingComplete", {
 					whoId: this.id
 				})
 
 			}, behavior.time)
+			this.isStanding = false
 		}
 	}
 

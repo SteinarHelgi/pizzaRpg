@@ -32,6 +32,35 @@ class OverworldMap {
 		})
 	}
 
+	async startCutscene(events) {
+		this.isCutscenePlaying = true;
+
+
+		//Start a loop of async events
+		//Await each one 
+
+		for (let i = 0; i < events.length; i++) {
+			const eventHandler = new OverworldEvent({
+				map: this,
+				event: events[i]
+			})
+			await eventHandler.init()
+		}
+		this.isCutscenePlaying = false
+		//Reset Npcs to do their auto thing
+		Object.values(this.gameObjects).forEach(object => { object.doBehaviorEvent(this) })
+
+	}
+
+	checkForActionCutscene() {
+		const hero = this.gameObjects["hero"]
+		const nextCoords = utils.nextPosition(hero.x, hero.y, hero.direction)
+		const match = Object.values(this.gameObjects).find(object => {
+			return `${object.x},${object.y}` === `${nextCoords.x},${nextCoords.y}`
+		})
+		console.log({ match })
+
+	}
 	addWall(x, y) {
 		this.walls[`${x},${y}`] = true
 	}
@@ -51,15 +80,15 @@ window.OverworldMaps = {
 		gameObjects: {
 			hero: new Person({
 				isPlayerControlled: true,
-				x: utils.withGrid(5),
-				y: utils.withGrid(7),
+				x: utils.withGrid(2),
+				y: utils.withGrid(6),
 			}),
 			npc1: new Person({
-				x: utils.withGrid(4),
-				y: utils.withGrid(6),
+				x: utils.withGrid(7),
+				y: utils.withGrid(4),
 				src: "/images/characters/people/npc1.png",
 				behaviorLoop: [
-					{ type: "walk", direction: "left" },
+					{ type: "walk", direction: "down" },
 					{ type: "stand", direction: "left", time: 800 },
 					{ type: "walk", direction: "up" },
 					{ type: "stand", direction: "right", time: 800 },
@@ -69,7 +98,13 @@ window.OverworldMaps = {
 					{ type: "walk", direction: "right" },
 					{ type: "stand", direction: "left", time: 800 },
 					{ type: "walk", direction: "up" },
-
+				],
+				talking: [
+					{
+						events: [
+							{ type: "TextMessage", text: "hi there!" }
+						]
+					}
 				]
 			}),
 			npc2: new Person({
