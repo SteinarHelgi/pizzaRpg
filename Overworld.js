@@ -7,6 +7,7 @@ class Overworld {
 
 	}
 	startGameLoop() {
+		if (this.rafId) cancelAnimationFrame(this.rafId);
 		const step = () => {
 			//Clear draw
 			this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
@@ -31,11 +32,16 @@ class Overworld {
 			this.map.drawUpperImage(this.ctx, cameraPerson)
 
 			//Loop again
-			requestAnimationFrame(() => {
-				step()
-			})
+			this.rafId = requestAnimationFrame(step)
 		}
-		step()
+		this.rafId = requestAnimationFrame(step)
+	}
+
+	stopGameLoop() {
+		if (this.rafId) {
+			cancelAnimationFrame(this.rafId);
+			this.rafId = null;
+		}
 	}
 
 	bindActionInput() {
@@ -46,28 +52,46 @@ class Overworld {
 		})
 	}
 
+	unbindHeroPosition() {
+		if (this.onHeroWalkComplete) {
+			document.removeEventListener("PersonWalkingComplete", this.onHeroWalkComplete);
+			this.onHeroWalkComplete = null;
+		}
+	}
+	bindHeroPosition() {
+		this.onHeroWalkComplete = (e) => {
+			if (e.detail.whoId === "hero") this.map.checkForFootstepCutscene();
+		};
+		document.addEventListener("PersonWalkingComplete", this.onHeroWalkComplete);
+	}
+	startMap(mapConfig) {
+		//Stop game loop and unbind everything
+		this.stopGameLoop?.()
+		this.unbindHeroPosition?.();
+		this.directionInput?.destroy?.();
+
+		//Change the map
+		this.map = new OverworldMap(mapConfig);
+		this.map.overworld = this;
+		this.map.mountObjects();
+
+		//Rebind and restart gameloop and bindings
+		this.bindHeroPosition();
+		this.directionInput?.init?.(); // if you want input active immediately
+		this.startGameLoop();
+	}
+
 
 	init() {
-		this.map = new OverworldMap(
-			window.OverworldMaps.DemoRoom
-		);
-		this.map.mountObjects()
+		this.startMap(window.OverworldMaps.Kitchen)
+
+
+		this.bindHeroPosition()
+		this.bindActionInput()
+
 		this.directionInput = new DirectionInput()
 		this.directionInput.init()
+
 		this.startGameLoop()
-		this.bindActionInput()
-		/* this.map.startCutscene([
-			{ who: "hero", type: "walk", direction: "right" },
-			{ who: "hero", type: "walk", direction: "right" },
-			{ who: "hero", type: "walk", direction: "right" },
-			{ who: "npc1", type: "walk", direction: "down" },
-			{ who: "npc1", type: "walk", direction: "left" },
-			{ who: "npc1", type: "walk", direction: "left" },
-			{ who: "npc1", type: "stand", direction: "down", time: 400 },
-			{ who: "hero", type: "stand", direction: "up", time: 400 },
-			{ type: "textMessage", text: "Thank you for coming" },
-			{ type: "textMessage", text: "Its my pleasure" },
-		])
-*/
 	}
 }

@@ -18,7 +18,6 @@ class DirectionInput {
 	get direction() {
 		return this.heldDirections[0]
 	}
-
 	init() {
 		document.addEventListener("keydown", e => {
 			const dir = this.map[e.key]
@@ -33,5 +32,9 @@ class DirectionInput {
 				this.heldDirections.splice(index, 1)
 			}
 		})
+	}
+	destroy() {
+		document.removeEventListener("keydown", this.onKeyDown);
+		document.removeEventListener("keyup", this.onKeyUp);
 	}
 }

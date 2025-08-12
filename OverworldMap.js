@@ -1,7 +1,8 @@
 class OverworldMap {
 	constructor(config) {
+		this.overworld = null;
 		this.gameObjects = config.gameObjects;
-		this.walls = config.walls
+		this.walls = config.walls || {};
 
 		this.lowerImage = new Image();
 		this.lowerImage.src = config.lowerSrc;
@@ -9,7 +10,9 @@ class OverworldMap {
 		this.upperImage = new Image()
 		this.upperImage.src = config.upperSrc;
 
-		this.isCutscenePlaying = false
+		this.isCutscenePlaying = false;
+
+		this.cutsceneSpaces = config.cutsceneSpaces || {};
 	}
 	drawLowerImage(ctx, cameraPerson) {
 		ctx.drawImage(this.lowerImage, utils.withGrid(10.5) - cameraPerson.x, utils.withGrid(6) - cameraPerson.y)
@@ -55,6 +58,8 @@ class OverworldMap {
 	checkForActionCutscene() {
 		const hero = this.gameObjects["hero"]
 		const nextCoords = utils.nextPosition(hero.x, hero.y, hero.direction)
+		const map = this
+		console.log(map)
 		const match = Object.values(this.gameObjects).find(object => {
 			return `${object.x},${object.y}` === `${nextCoords.x},${nextCoords.y}`
 		})
@@ -62,15 +67,24 @@ class OverworldMap {
 			this.startCutscene(match.talking[0].events)
 
 		}
-
-
 	}
+
+	checkForFootstepCutscene() {
+		const hero = this.gameObjects["hero"]
+		const match = this.cutsceneSpaces[`${hero.x},${hero.y}`]
+		if (!this.isCutscenePlaying && match) {
+			this.startCutscene(match[0].events)
+		}
+	}
+
 	addWall(x, y) {
 		this.walls[`${x},${y}`] = true
 	}
+
 	removeWall(x, y) {
 		delete this.walls[`${x},${y}`]
 	}
+
 	moveWall(wasX, wasY, direction) {
 		this.removeWall(wasX, wasY)
 		const { x, y } = utils.nextPosition(wasX, wasY, direction)
@@ -88,12 +102,9 @@ window.OverworldMaps = {
 				y: utils.withGrid(6),
 			}),
 			npc1: new Person({
-				x: utils.withGrid(7),
+				x: utils.withGrid(8),
 				y: utils.withGrid(5),
 				src: "/images/characters/people/npc1.png",
-				behaviorLoop: [
-					{ type: "stand", direction: "right", time: 800 },
-				],
 				talking: [
 					{
 						events: [
@@ -109,15 +120,29 @@ window.OverworldMaps = {
 				y: utils.withGrid(9),
 				src: "/images/characters/people/npc2.png",
 				behaviorLoop: [
-					{ type: "walk", direction: "left" },
 					{ type: "stand", direction: "left", time: 800 },
-					{ type: "walk", direction: "up" },
-					{ type: "walk", direction: "right" },
-					{ type: "walk", direction: "down" },
 				]
-
 			}),
-
+		},
+		cutsceneSpaces: {
+			[utils.asGridCoord(7, 4)]: [
+				{
+					events: [
+						{ who: "npc1", type: "walk", direction: "left" },
+						{ type: "textMessage", text: "Hey you cant be in there!" },
+						{ who: "npc1", type: "walk", direction: "right" },
+						{ who: "hero", type: "walk", direction: "down" },
+						{ who: "hero", type: "walk", direction: "left" },
+					]
+				}
+			],
+			[utils.asGridCoord(5, 10)]: [
+				{
+					events: [
+						{ type: "changeMap", map: "Kitchen" },
+					]
+				}
+			]
 		},
 		walls: {
 			//"16,16":true
@@ -147,19 +172,36 @@ window.OverworldMaps = {
 		upperSrc: "/images/maps/KitchenUpper.png",
 		gameObjects: {
 			hero: new Person({
-				x: 3,
-				y: 5
+				isPlayerControlled: true,
+				x: utils.withGrid(3),
+				y: utils.withGrid(5),
 			}),
-			npc1: new Person({
-				x: 9,
-				y: 6,
-				src: "images/characters/people/npc1.png"
-			}),
-			npc2: new Person({
-				x: 10,
-				y: 8,
-				src: "images/characters/people/npc2.png"
+			npc3: new Person({
+				x: utils.withGrid(10),
+				y: utils.withGrid(8),
+				src: "images/characters/people/npc3.png",
+				behaviorLoop: [
+					{ type: "stand", direction: "left" },
+				],
+				talking: [
+					{
+						events: [
+							{ type: "textMessage", text: "you made it!" },
+						],
+					}
+				],
 			})
-		}
+		},
+		cutsceneSpaces: {
+			[utils.asGridCoord(5, 10)]: [
+				{
+					events: [
+						{ type: "changeMap", map: "DemoRoom" },
+					]
+				}
+			]
+		},
+
+
 	}
 }
