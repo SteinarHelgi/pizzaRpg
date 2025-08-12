@@ -26,14 +26,20 @@ class OverworldMap {
 		const { x, y } = utils.nextPosition(currentX, currentY, direction)
 		return this.walls[`${x},${y}`] || false
 	}
-	mountObjects() {
-		Object.keys(this.gameObjects).forEach((key) => {
-			let object = this.gameObjects[key]
-			object.id = key
-			//TODO: determine if objects should be mounted
-			object.mount(this)
-		})
-	}
+        mountObjects() {
+                Object.keys(this.gameObjects).forEach((key) => {
+                        let object = this.gameObjects[key]
+                        object.id = key
+                        //TODO: determine if objects should be mounted
+                        object.mount(this)
+                })
+        }
+
+        unmountObjects() {
+                Object.values(this.gameObjects).forEach((object) => {
+                        object.destroy?.();
+                });
+        }
 
 	async startCutscene(events) {
 		this.isCutscenePlaying = true;
