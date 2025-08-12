@@ -64,14 +64,17 @@ class Overworld {
 		};
 		document.addEventListener("PersonWalkingComplete", this.onHeroWalkComplete);
 	}
-	startMap(mapConfig) {
-		//Stop game loop and unbind everything
-		this.stopGameLoop?.()
-		this.unbindHeroPosition?.();
-		this.directionInput?.destroy?.();
+        startMap(mapConfig) {
+                //Stop game loop and unbind everything
+                this.stopGameLoop?.()
+                this.unbindHeroPosition?.();
+                this.directionInput?.destroy?.();
 
-		//Change the map
-		this.map = new OverworldMap(mapConfig);
+                //Unmount old map objects
+                this.map?.unmountObjects?.();
+
+                //Change the map
+                this.map = new OverworldMap(mapConfig);
 		this.map.overworld = this;
 		this.map.mountObjects();
 
