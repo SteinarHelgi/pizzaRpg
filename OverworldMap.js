@@ -1,17 +1,17 @@
 class OverworldMap {
-        constructor(config) {
-                this.overworld = null;
-                this.walls = config.walls || {};
-                this.gameObjects = {};
+	constructor(config) {
+		this.overworld = null;
+		this.walls = config.walls || {};
+		this.gameObjects = {};
 
-                Object.keys(config.gameObjects).forEach(key => {
-                        let objectConfig = config.gameObjects[key];
-                        let object;
-                        // In the future, different object types could be initialized here
-                        object = new Person(objectConfig);
-                        object.id = key;
-                        this.gameObjects[key] = object;
-                });
+		Object.keys(config.gameObjects).forEach(key => {
+			let objectConfig = config.gameObjects[key];
+			let object;
+			// In the future, different object types could be initialized here
+			object = new Person(objectConfig);
+			object.id = key;
+			this.gameObjects[key] = object;
+		});
 
 		this.lowerImage = new Image();
 		this.lowerImage.src = config.lowerSrc;
@@ -35,20 +35,20 @@ class OverworldMap {
 		const { x, y } = utils.nextPosition(currentX, currentY, direction)
 		return this.walls[`${x},${y}`] || false
 	}
-        mountObjects() {
-                Object.keys(this.gameObjects).forEach((key) => {
-                        let object = this.gameObjects[key]
-                        object.id = key
-                        //TODO: determine if objects should be mounted
-                        object.mount(this)
-                })
-        }
+	mountObjects() {
+		Object.keys(this.gameObjects).forEach((key) => {
+			let object = this.gameObjects[key]
+			object.id = key
+			//TODO: determine if objects should be mounted
+			object.mount(this)
+		})
+	}
 
-        unmountObjects() {
-                Object.values(this.gameObjects).forEach((object) => {
-                        object.destroy?.();
-                });
-        }
+	unmountObjects() {
+		Object.values(this.gameObjects).forEach((object) => {
+			object.destroy?.();
+		});
+	}
 
 	async startCutscene(events) {
 		this.isCutscenePlaying = true;
@@ -110,38 +110,38 @@ window.OverworldMaps = {
 	DemoRoom: {
 		lowerSrc: "/images/maps/DemoLower.png",
 		upperSrc: "/images/maps/DemoUpper.png",
-                gameObjects: {
-                        hero: {
-                                type: "Person",
-                                isPlayerControlled: true,
-                                x: utils.withGrid(2),
-                                y: utils.withGrid(6),
-                        },
-                        npc1: {
-                                type: "Person",
-                                x: utils.withGrid(8),
-                                y: utils.withGrid(5),
-                                src: "/images/characters/people/npc1.png",
-                                talking: [
-                                        {
-                                                events: [
-                                                        { type: "textMessage", text: "hi there!", faceHero: "npc1" },
-                                                        { type: "textMessage", text: "how are ya'" },
+		gameObjects: {
+			hero: {
+				type: "Person",
+				isPlayerControlled: true,
+				x: utils.withGrid(2),
+				y: utils.withGrid(6),
+			},
+			npc1: {
+				type: "Person",
+				x: utils.withGrid(8),
+				y: utils.withGrid(5),
+				src: "/images/characters/people/npc1.png",
+				talking: [
+					{
+						events: [
+							{ type: "textMessage", text: "hi there!", faceHero: "npc1" },
+							{ type: "textMessage", text: "how are ya'" },
 
-                                                ]
-                                        }
-                                ]
-                        },
-                        npc2: {
-                                type: "Person",
-                                x: utils.withGrid(6),
-                                y: utils.withGrid(9),
-                                src: "/images/characters/people/npc2.png",
-                                behaviorLoop: [
-                                        { type: "stand", direction: "left", time: 800 },
-                                ]
-                        },
-                },
+						]
+					}
+				]
+			},
+			npc2: {
+				type: "Person",
+				x: utils.withGrid(6),
+				y: utils.withGrid(9),
+				src: "/images/characters/people/npc2.png",
+				behaviorLoop: [
+					{ type: "stand", direction: "left", time: 800 },
+				]
+			},
+		},
 		cutsceneSpaces: {
 			[utils.asGridCoord(7, 4)]: [
 				{
@@ -188,30 +188,30 @@ window.OverworldMaps = {
 	Kitchen: {
 		lowerSrc: "/images/maps/KitchenLower.png",
 		upperSrc: "/images/maps/KitchenUpper.png",
-                gameObjects: {
-                        hero: {
-                                type: "Person",
-                                isPlayerControlled: true,
-                                x: utils.withGrid(3),
-                                y: utils.withGrid(5),
-                        },
-                        npc3: {
-                                type: "Person",
-                                x: utils.withGrid(10),
-                                y: utils.withGrid(8),
-                                src: "images/characters/people/npc3.png",
-                                behaviorLoop: [
-                                        { type: "stand", direction: "left" },
-                                ],
-                                talking: [
-                                        {
-                                                events: [
-                                                        { type: "textMessage", text: "you made it!" },
-                                                ],
-                                        }
-                                ],
-                        }
-                },
+		gameObjects: {
+			hero: {
+				type: "Person",
+				isPlayerControlled: true,
+				x: utils.withGrid(3),
+				y: utils.withGrid(5),
+			},
+			npc3: {
+				type: "Person",
+				x: utils.withGrid(10),
+				y: utils.withGrid(8),
+				src: "images/characters/people/npc3.png",
+				behaviorLoop: [
+					{ type: "stand", direction: "left" },
+				],
+				talking: [
+					{
+						events: [
+							{ type: "textMessage", text: "you made it!" },
+						],
+					}
+				],
+			}
+		},
 		cutsceneSpaces: {
 			[utils.asGridCoord(5, 10)]: [
 				{

@@ -20,7 +20,6 @@ class KeyPressListener {
 	unbind() {
 		document.removeEventListener("keydown", this.keydownFunction)
 		document.removeEventListener("keyup", this.keyupFunction)
-
 	}
 
 }

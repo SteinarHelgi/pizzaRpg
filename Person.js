@@ -1,13 +1,13 @@
 class Person extends GameObject {
 
 	constructor(config) {
-                super(config)
-                this.movingProgressRemaining = 0;
-                this.isStanding = false
-                this.isPlayerControlled = config.isPlayerControlled || false
-                // Track any timeouts so they can be cleared if this person is destroyed
-                this.retryTimeout = null
-                this.standTimeout = null
+		super(config)
+		this.movingProgressRemaining = 0;
+		this.isStanding = false
+		this.isPlayerControlled = config.isPlayerControlled || false
+		// Track any timeouts so they can be cleared if this person is destroyed
+		this.retryTimeout = null
+		this.standTimeout = null
 		this.directionUpdate = {
 			"up": ["y", -1],
 			"down": ["y", 1],
@@ -42,30 +42,30 @@ class Person extends GameObject {
 		this.direction = behavior.direction
 		//only move if no space is taken
 		if (behavior.type === "walk") {
-                        if (state.map.isSpaceTaken(this.x, this.y, this.direction)) {
-                                if (behavior.retry) {
-                                        this.retryTimeout = setTimeout(() => {
-                                                this.startBehavior(state, behavior)
-                                        }, 10)
-                                }
-                                return;
-                        }
+			if (state.map.isSpaceTaken(this.x, this.y, this.direction)) {
+				if (behavior.retry) {
+					this.retryTimeout = setTimeout(() => {
+						this.startBehavior(state, behavior)
+					}, 10)
+				}
+				return;
+			}
 			//Walk!
 			state.map.moveWall(this.x, this.y, this.direction)
 			this.movingProgressRemaining = 16;
 			this.updateSprite(state)
 		}
 		if (behavior.type === "stand") {
-                        this.isStanding = true
-                        this.standTimeout = setTimeout(() => {
-                                utils.emitEvent("PersonStandingComplete", {
-                                        whoId: this.id
-                                })
+			this.isStanding = true
+			this.standTimeout = setTimeout(() => {
+				utils.emitEvent("PersonStandingComplete", {
+					whoId: this.id
+				})
 
-                        }, behavior.time)
-                        this.isStanding = false
-                }
-        }
+			}, behavior.time)
+			this.isStanding = false
+		}
+	}
 
 	updatePosition() {
 		const [property, change] = this.directionUpdate[this.direction]
@@ -78,18 +78,18 @@ class Person extends GameObject {
 			})
 		}
 	}
-        updateSprite() {
-                if (this.movingProgressRemaining > 0) {
-                        this.sprite.setAnimation("walk-" + this.direction)
-                        return
-                }
-                this.sprite.setAnimation("idle-" + this.direction)
-        }
+	updateSprite() {
+		if (this.movingProgressRemaining > 0) {
+			this.sprite.setAnimation("walk-" + this.direction)
+			return
+		}
+		this.sprite.setAnimation("idle-" + this.direction)
+	}
 
-        destroy() {
-                super.destroy()
-                clearTimeout(this.retryTimeout)
-                clearTimeout(this.standTimeout)
-        }
+	destroy() {
+		super.destroy()
+		clearTimeout(this.retryTimeout)
+		clearTimeout(this.standTimeout)
+	}
 
 }
